@@ -1,0 +1,3 @@
+[submodule "maize-maze"]
+	path = maize-maze
+	url = git@github.com:Simponic/maize-maze
