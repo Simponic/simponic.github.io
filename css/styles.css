@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  background-color: #AAAAAA;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.top-container {
+  text-align: center;
+  height: 100vh; 
+  padding: 24px;
+}
+
+.profile-picture {
+  width: 100%;
+  border-radius: 50%;
+  max-width: 600px;
+  box-shadow:0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.projects-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 24px;
+  gap: 12px;
+}
+
+.project {
+  text-decoration: none;
+  color: black;
+  border-radius: 8px;
+  flex: 1;
+  background-color: #888888;
+  display: flex;
+  box-shadow:0 8px 12px 0 rgba(0,0,0,0.2),0 6px 12px 0 rgba(0,0,0,0.17);
+  min-width: 300px;
+  transition: transform 250ms;
+  padding: 12px;
+  gap: 12px;
+}
+
+.project:hover {
+  background-color: #666666;
+  transform: translateY(-8px);
+  cursor: pointer;
+}
+
+.project-logo-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+}
+
+.project-body {
+  flex: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: left;
+}
