@@ -6,20 +6,42 @@
     <style>
       body {
         margin: 0;
-        background: black;
-        height: 100%;
-        width: 100%;
+        background-color: black;
+      }
+      #container {
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
       }
       #dvd-logo {
         width: 200px;
         position: absolute;
-        left: -200px; /* So that logo doesn't flash at top left corner when document loads */
+        left: -200px;
         top: -200px;
+      }
+      .controls {
+        padding: 12px;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(255,255,255,0.5);
+        border: 1px solid white;
+        border-radius: 8px;
+        margin-right: 6px;
+        margin-bottom: 6px;
       }
     </style>
   </head>
   <body>
-    <img id="dvd-logo" src="images/dvd-logo.png">
+    <div id="container">
+      <img id="dvd-logo" src="images/dvd-logo.png">
+
+      <div class="controls">
+        <span id="iteration-count"></span>
+        <br>
+        <input type="range" min="0" max="500" id="iteration-slider">
+      </div>
+    </div>
     <script src="js/script.js"></script>
   </body>
 </html>
