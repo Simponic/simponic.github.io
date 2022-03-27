@@ -1,3 +1,6 @@
 [submodule "maize-maze"]
 	path = maize-maze
 	url = git@github.com:Simponic/maize-maze
+[submodule "centipede"]
+	path = centipede
+	url = git@github.com:Simponic/centipede.git
