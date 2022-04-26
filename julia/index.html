@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style>
+      body {
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+      }
+      .bottomRight {
+        padding: 12px;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(255,255,255,0.5);
+        border: 1px solid white;
+        border-radius: 8px;
+        margin-right: 6px;
+        margin-bottom: 6px;
+      }
+      .verticalSlider
+      {
+        writing-mode: bt-lr; /* IE */
+        -webkit-appearance: slider-vertical; /* Chromium */
+        width: 8px;
+        padding: 0 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvasHolder">
+      
+    </div>
+    <div class="bottomRight">
+      <input orient="vertical" type="range" min="-1000" max="1000" value="0" id="imaginarySlider" class="verticalSlider">
+      <input type="range" min="-1000" max="1000" value="0" id="realSlider">
+      <br>
+      imaginary: <span id="imag-val"></span>
+      <button id="animate-imag" onclick="startImagAnim()">Animate</button>
+      <br>
+      real: <span id="real-val"></span>
+      <button id="animate-real" onclick="startRealAnim()">Animate</button>
+      <br>
+      powered by <a href="https://github.com/gpujs/gpu.js">gpu.js</a>
+    </div>
+
+    <script src="gpu-browser.js"></script>
+    <script src="julia.js"></script>
+  </body>
+</html>
