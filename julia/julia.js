@@ -46,18 +46,13 @@ const doRender = (renderF, state) => {
   renderF(state.maxIterations, state.cr, state.ci, state.centerX, state.centerY, state.zoom, state.colorMultipliers);
 };
 
-const attachCanvasWithDimension = () => {
-  render = buildRender(state.width, state.height);
-  doRender(render, state);
-  canvasHolder.appendChild(render.canvas);
-};
-
 const loop = () => {
   const stateChanges = Object.keys(state.changes);
   if (stateChanges.length > 0) {
     state = {...state, ...state.changes};
     if (state.changes.width || state.changes.height) {
-      attachCanvasWithDimension();
+      render = buildRender(state.width, state.height);
+      canvasHolder.appendChild(render.canvas);
     }
     if (state.changes.ci !== undefined) {
       document.getElementById("imag-val").innerHTML = state.ci.toFixed(4);
