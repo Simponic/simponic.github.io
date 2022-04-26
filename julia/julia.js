@@ -29,7 +29,7 @@ const buildRender = (width, height) => gpu.createKernel(function (maxIterations,
 const canvasHolder = document.getElementById('canvasHolder');
 let render; // The GPU kernel built from buildRender
 let state = {
-  colorMultipliers: [0.01 * Math.random(), 0.03 * Math.random(), 0.02 * Math.random()],
+  colorMultipliers: [0.01 * Math.random() + 0.005, 0.03 * Math.random() + 0.005, 0.02 * Math.random() + 0.005],
   changes: {
     centerX: 0,
     centerY: 0,
