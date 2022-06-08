@@ -36,11 +36,11 @@
       <input orient="vertical" type="range" min="-1000" max="1000" value="0" id="imaginarySlider" class="verticalSlider">
       <input type="range" min="-1000" max="1000" value="0" id="realSlider">
       <br>
-      imaginary: <span id="imag-val"></span>
-      <button id="animate-imag" onclick="startImagAnim()">Animate</button>
+      imaginary: <input id="imag-val" size="10" type="number" step="0.001"></input>
+      <button id="animate-imag" onclick="startAnim('animate-imag', 'ci')">Animate</button>
       <br>
-      real: <span id="real-val"></span>
-      <button id="animate-real" onclick="startRealAnim()">Animate</button>
+      real: <input id="real-val" size="10" type="number" step="0.001"></input>
+      <button id="animate-real" onclick="startAnim('animate-real', 'cr')">Animate</button>
       <br>
       powered by <a href="https://github.com/gpujs/gpu.js">gpu.js</a>
     </div>
