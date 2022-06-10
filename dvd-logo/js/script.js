@@ -107,8 +107,8 @@ window.onload = () => {
   let logo = {
     x: Math.floor(randUpTo(window.innerWidth-dvdLogo.clientWidth)),
     y: Math.floor(randUpTo(window.innerHeight-dvdLogo.clientHeight)),
-    dx: 2,
-    dy: 2,
+    dx: 1.2,
+    dy: 1.2,
     width: dvdLogo.clientWidth,
     height: dvdLogo.clientHeight,
     onIntersection: makeListOfFutureCollisionsAndDraw,
@@ -117,7 +117,7 @@ window.onload = () => {
   setInterval(() => {
     updateLogo(logo, window.innerWidth-logo.width, window.innerHeight-logo.height);
     drawLogo(logo, dvdLogo);
-  }, 22);
+  }, 12);
 
   drawNewPaths = () => makeListOfFutureCollisionsAndDraw(logo, window.innerWidth-logo.width, window.innerHeight-logo.height);
   drawNewPaths();
