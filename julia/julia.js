@@ -70,8 +70,8 @@ const loop = () => {
 
 loop();
 
+// UI Code
 
-// NOTE: UI code is trash lol
 const startAnim = (sliderId, complexComponentName='ci') => {
   const restart = (interval) => {
     clearInterval(interval);
