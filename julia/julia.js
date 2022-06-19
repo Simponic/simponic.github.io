@@ -81,7 +81,6 @@ const startAnim = (sliderId, complexComponentName='ci') => {
   };
   const start = setInterval(() => {
     if (state[complexComponentName] >= C_THRESHOLD) {
-      console.log("OVER", C_THRESHOLD);
       restart(start);
     }
 
