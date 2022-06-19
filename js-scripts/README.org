@@ -1,0 +1,2 @@
+* js-scripts
+These are just scripts that I use to test XSS bugs and whatnot; I'm not very good and I have no idea what I am doing this so please ignore them.
