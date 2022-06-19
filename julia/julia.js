@@ -1,7 +1,7 @@
 const MIN_ZOOM = 0.0001;
 const MAX_ZOOM = 4;
 const C_THRESHOLD = Math.sqrt(2)/2;
-const SLIDER_DIV = 1000*C_THRESHOLD;
+const SLIDER_DIV = 2000*C_THRESHOLD;
 
 const gpu = new GPU();
 const buildRender = (width, height) => gpu.createKernel(function (maxIterations, cr, ci, centerX, centerY, zoom, colorMultipliers) {
@@ -81,6 +81,7 @@ const startAnim = (sliderId, complexComponentName='ci') => {
   };
   const start = setInterval(() => {
     if (state[complexComponentName] >= C_THRESHOLD) {
+      console.log("OVER", C_THRESHOLD);
       restart(start);
     }
 
@@ -90,11 +91,11 @@ const startAnim = (sliderId, complexComponentName='ci') => {
   document.getElementById(sliderId).onclick = ()=>restart(start);
 };
 
-document.getElementById('realSlider').oninput = function() {
-  state.changes.cr = parseFloat(this.value) / SLIDER_DIV;
-};
 document.getElementById('imaginarySlider').oninput = function() {
   state.changes.ci = parseFloat(this.value) / SLIDER_DIV;
+};
+document.getElementById('realSlider').oninput = function() {
+  state.changes.cr = parseFloat(this.value) / SLIDER_DIV;
 };
 
 document.getElementById('imag-val').addEventListener('change', function (e) {
