@@ -108,8 +108,8 @@ const loop = () => {
         y: state.topLeftGridPos.y + state.gridBoxHeight,
       };
     }
-    if (Object.keys(state.diff).length) draw(state);
     if (state.diff.heights) drawDesmos();
+    draw(state);
     state.diff = {};
   }
 
