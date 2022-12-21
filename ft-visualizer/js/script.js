@@ -93,8 +93,7 @@ const loop = () => {
         (a, label) => Math.max(ctx.measureText(label).width, a),
         -Infinity
       );
-      console.log(state.maxYLabelWidth);
-
+      
       state.gridBoxWidth =
         state.width - state.maxYLabelWidth - state.yLabelPadding;
       state.gridBoxHeight = state.height - 2.5 * FONT_HEIGHT_PX; // 2.5 to include bottom part of tall letters ("g", "y", etc.)
