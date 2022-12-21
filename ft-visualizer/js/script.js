@@ -2,11 +2,10 @@ const RENDER_TYPE = {
   LATEX: 1,
   FUNC: 2,
 };
-const THRESHOLD = 1e-10;
-const LATEX_SIGFIGS = 8;
+const THRESHOLD = 1e-12;
 const FONT = "Courier New";
-const FONT_HEIGHT_PX = 16;
-const DX = 3;
+const FONT_HEIGHT_PX = 24;
+const DX = 4;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -33,17 +32,12 @@ const initializeState = () => {
     height: canvas.parentElement.clientHeight,
     xLabels,
     yLabels,
-    gridBox: { width: 0.9, height: 0.9 },
+    yLabelPadding: 12,
     heights: Array(xLabels.length * DX - 1).fill(0),
   };
 };
 
-const dft = (
-  heights,
-  render = RENDER_TYPE.LATEX,
-  threshold = THRESHOLD,
-  sigfigs = LATEX_SIGFIGS
-) => {
+const dft = (heights, render = RENDER_TYPE.LATEX, threshold = THRESHOLD) => {
   const n = heights.length;
   return Array(n)
     .fill()
@@ -67,9 +61,9 @@ const dft = (
 
       switch (render) {
         case RENDER_TYPE.LATEX:
-          return `${amp.toPrecision(sigfigs)}\\cos\\left(${w}x\\frac{2}{${
-            n / DX
-          }}\\pi+${phase.toPrecision(sigfigs)}\\right)`;
+          return `${amp}\\cos\\left(${w}\\frac{${
+            2 * DX
+          }\\pi}{${n}}x+${phase}\\right)`;
         case RENDER_TYPE.FUNC:
           return (t) => amp * Math.cos(w * t + phase);
       }
@@ -91,21 +85,23 @@ const loop = () => {
       state.diff.width ||
       state.diff.height ||
       state.diff.xLabels ||
-      state.diff.yLabels ||
-      state.diff.gridBox
+      state.diff.yLabels
     ) {
       resizeCanvas(state.diff);
-      state.gridBoxWidth = state.gridBox.width * state.width;
-      state.gridBoxHeight = state.gridBox.height * state.height;
-
+      ctx.font = `${FONT_HEIGHT_PX}px ${FONT}`;
       state.maxYLabelWidth = state.yLabels.reduce(
         (a, label) => Math.max(ctx.measureText(label).width, a),
         -Infinity
       );
+      console.log(state.maxYLabelWidth);
+
+      state.gridBoxWidth =
+        state.width - state.maxYLabelWidth - state.yLabelPadding;
+      state.gridBoxHeight = state.height - 2.5 * FONT_HEIGHT_PX; // 2.5 to include bottom part of tall letters ("g", "y", etc.)
 
       state.topLeftGridPos = {
-        x: (state.width - state.gridBoxWidth) / 2 + state.maxYLabelWidth,
-        y: (state.height - state.gridBoxHeight) / 2,
+        x: state.maxYLabelWidth + state.yLabelPadding,
+        y: FONT_HEIGHT_PX,
       };
 
       state.bottomRightGridPos = {
@@ -135,12 +131,9 @@ const drawDividers = (
   bottomRightGridPos,
   yLabelPadding
 ) => {
+  ctx.font = `${FONT_HEIGHT_PX}px ${FONT}`;
   xDividers.forEach(({ label, position }) => {
-    ctx.fillText(
-      label,
-      position.x - ctx.measureText(label).width / 2,
-      position.y
-    );
+    ctx.fillText(label, position.x - ctx.measureText(label).width, position.y);
     drawLine(
       { ...position, y: topLeftGridPos.y },
       { ...position, y: bottomRightGridPos.y }
@@ -173,8 +166,6 @@ const draw = ({
 }) => {
   ctx.clearRect(0, 0, width, height);
 
-  ctx.font = `${FONT_HEIGHT_PX}px ${FONT}`;
-
   const xDividers = xLabels.map((label, i) => ({
     label,
     position: {
@@ -192,7 +183,8 @@ const draw = ({
   }));
 
   drawDividers(xDividers, yDividers, topLeftGridPos, bottomRightGridPos, 12);
-  let dx = (bottomRightGridPos.x - topLeftGridPos.x) / (heights.length - 1);
+
+  const dx = gridBoxWidth / (DX * (xLabels.length - 1));
   const prevStrokeStyle = ctx.strokeStyle;
   ctx.strokeStyle = "red";
   for (let i = 0; i < heights.length; ++i) {
@@ -271,8 +263,10 @@ canvas.addEventListener(
         gridBoxWidth,
         gridBoxHeight,
         heights,
+        xLabels,
       } = state;
-      const delta = Math.ceil(gridBoxWidth / heights.length);
+      const delta = gridBoxWidth / (DX * (xLabels.length - 1));
+
       const bin = Math.min(
         Math.round(Math.max(x - topLeftGridPos.x, 0) / delta),
         heights.length - 1
