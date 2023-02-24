@@ -1,4 +1,4 @@
-const DEPTH = 21;
+const DEPTH = 22;
 
 const DIRECTION = {
   0: new cx(0, 1),

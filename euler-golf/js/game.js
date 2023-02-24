@@ -2,7 +2,7 @@ const DEFAULTS = {
   max_rows: 80,
   max_cols: 80,
   min_gap: 40,
-  angle_multiplier: 0.0005,
+  angle_multiplier: 10e-4,
 };
 const CANVAS = document.getElementById("canvas");
 
@@ -137,7 +137,7 @@ const handle_input = (state, dt) => {
 
 const render = ({ width, height, ctx, rows, cols } = state) => {
   ctx.clearRect(0, 0, width, height);
-  ctx.fillStyle = "rgba(255, 255, 255, 0)";
+  ctx.fillStyle = "rgba(0, 0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
 
   const grid_spec = calculate_grid_spec(state);
@@ -156,11 +156,25 @@ const render = ({ width, height, ctx, rows, cols } = state) => {
     complex_to_grid(cx.add(new cx(angle_re, angle_im), prev), rows, cols),
   ]);
 
+  ctx.line(
+    grid_to_canvas(complex_to_grid(curr, rows, cols), grid_spec),
+    grid_to_canvas(
+      complex_to_grid(
+        move(prev, curr, new cx(0, state.angle.im < 0 ? -1 : 1)),
+        rows,
+        cols
+      ),
+      grid_spec
+    ),
+    6,
+    "#aaa"
+  );
+
   ctx.cartesian_grid(rows, cols, grid_spec, (x, y) => {
     if (x == Math.floor(cols / 2) && y == Math.floor(rows / 2)) {
       return {
         radius: 7,
-        color: "#0000ff",
+        color: "#2f9c94",
       };
     } else {
       return {
