@@ -4,16 +4,24 @@ body {
   overflow: scroll;
   font-family: Lucida Console, Lucida Sans Typewriter, monaco,
     Bitstream Vera Sans Mono, monospace;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(238, 174, 202);
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
 }
 
-.canvas-holder canvas {
+.canvas {
   padding: 0;
   margin: auto;
   display: block;
-  height: 70vh;
-  width: auto;
-  max-width: 100%;
   border: 1px solid black;
+
+  width: 100vw;
+  height: 100vw;
 }
 
 .button {
@@ -21,4 +29,16 @@ body {
   border-radius: 5px;
   padding: 5px;
   cursor: pointer;
+}
+
+.controls {
+  padding: 12px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px solid white;
+  border-radius: 8px;
+  margin-right: 6px;
+  margin-bottom: 6px;
 }

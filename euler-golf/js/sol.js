@@ -5,8 +5,6 @@ const DIRECTION = {
   1: new cx(0, -1),
 };
 
-const move = (prev, curr, c) => cx.add(prev, cx.mult(c, cx.sub(curr, prev)));
-
 const construct_moves = (curr, prev) =>
   Object.keys(DIRECTION).map((x) => move(curr, prev, DIRECTION[x]));
 
