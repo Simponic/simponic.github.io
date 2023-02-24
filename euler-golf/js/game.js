@@ -1,18 +1,16 @@
 const DEFAULTS = {
   max_rows: 80,
   max_cols: 80,
-  min_gap: 40,
+  min_gap: 30,
   angle_multiplier: 10e-4,
 };
 const CANVAS = document.getElementById("canvas");
 
 let state = {
-  grid_padding: 10,
+  grid_padding: 30,
   canvas: CANVAS,
   ctx: CANVAS.getContext("2d"),
   last_render: 0,
-  path: [new cx(0, 0), new cx(1, 0)],
-  angle: new cx(0, 0),
   keys: {},
   changes: {},
 };
@@ -59,7 +57,7 @@ CanvasRenderingContext2D.prototype.draw_cartesian_path = function (
 CanvasRenderingContext2D.prototype.do_grid = function (
   rows,
   cols,
-  draw_at_grid_pos = (ctx, x, y) => ctx.circle(x, y, 10, "#00ff00")
+  draw_at_grid_pos = (ctx, x, y) => ctx.circle(x, y, 10, "#44ff44")
 ) {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -88,9 +86,11 @@ const move = (prev, curr, c) => cx.add(prev, cx.mult(c, cx.sub(curr, prev)));
 const rand_between = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
-const rand_target = (cols, rows) => {
-  const res = new cx(rand_between(0, cols), rand_between(0, rows));
-  if (res.re % 2 || res.im % 2) return rand_target(cols, rows);
+const rand_target = (rows, cols) => {
+  const r = Math.floor(rows / 2);
+  const c = Math.floor(cols / 2);
+  const res = new cx(rand_between(-c, c), rand_between(-r, r));
+  if (!sol(res)) return rand_target(rows, cols);
 
   return res;
 };
@@ -121,21 +121,26 @@ const complex_to_grid = (c, rows, cols) => {
 };
 
 // Game loop
+
+const maybe_add_state_angle_move = ({ angle } = state) => {
+  if (angle.im <= -1 || angle.im >= 1) {
+    angle.im = angle.im <= -1 ? -1 : 1;
+    state.path.push(move(state.path.at(-2), state.path.at(-1), angle));
+    state.angle = new cx(0, 0);
+  }
+  return state;
+};
+
 const handle_input = (state, dt) => {
   if (state.keys.ArrowLeft) {
     state.angle.im += DEFAULTS.angle_multiplier * dt;
   } else if (state.keys.ArrowRight) {
     state.angle.im -= DEFAULTS.angle_multiplier * dt;
   }
-
-  if (state.angle.im <= -1 || state.angle.im >= 1) {
-    state.angle.im = state.angle.im <= -1 ? -1 : 1;
-    state.path.push(move(state.path.at(-2), state.path.at(-1), state.angle));
-    state.angle = new cx(0, 0);
-  }
+  state = maybe_add_state_angle_move(state);
 };
 
-const render = ({ width, height, ctx, rows, cols } = state) => {
+const render = ({ width, height, ctx, rows, cols, target } = state) => {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgba(0, 0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
@@ -156,25 +161,28 @@ const render = ({ width, height, ctx, rows, cols } = state) => {
     complex_to_grid(cx.add(new cx(angle_re, angle_im), prev), rows, cols),
   ]);
 
-  ctx.line(
-    grid_to_canvas(complex_to_grid(curr, rows, cols), grid_spec),
-    grid_to_canvas(
-      complex_to_grid(
-        move(prev, curr, new cx(0, state.angle.im < 0 ? -1 : 1)),
-        rows,
-        cols
-      ),
-      grid_spec
-    ),
-    6,
-    "#aaa"
-  );
+  if (!(state.angle.im == state.angle.re && state.angle.re == 0)) {
+    // Draw path to next player's target
+    const [a, b] = [
+      curr,
+      move(prev, curr, new cx(0, state.angle.im < 0 ? -1 : 1)),
+    ].map((c) => grid_to_canvas(complex_to_grid(c, rows, cols), grid_spec));
+
+    ctx.line(a, b, 6, "#aaa");
+  }
+
+  const grid_target = complex_to_grid(target, rows, cols);
 
   ctx.cartesian_grid(rows, cols, grid_spec, (x, y) => {
     if (x == Math.floor(cols / 2) && y == Math.floor(rows / 2)) {
       return {
         radius: 7,
         color: "#2f9c94",
+      };
+    } else if (x == grid_target.x && y == grid_target.y) {
+      return {
+        radius: 8,
+        color: "#00ff00",
       };
     } else {
       return {
@@ -191,24 +199,47 @@ const loop = (now) => {
 
   if (Object.keys(state.changes).length > 0) {
     if (state.changes.width || state.changes.height) {
-      state.changes.rows = Math.min(
-        DEFAULTS.max_rows,
-        state.changes.height / DEFAULTS.min_gap
+      state.changes.rows = Math.floor(
+        Math.min(DEFAULTS.max_rows, state.changes.height / DEFAULTS.min_gap)
       );
-      state.changes.cols = Math.min(
-        DEFAULTS.max_cols,
-        state.changes.width / DEFAULTS.min_gap
+      state.changes.cols = Math.floor(
+        Math.min(DEFAULTS.max_cols, state.changes.width / DEFAULTS.min_gap)
       );
     }
 
     state = { ...state, ...state.changes };
+
     state.changes = {};
   }
 
-  handle_input(state, dt);
+  if (!state.target) {
+    state.target = rand_target(state.rows, state.cols);
+  }
+
+  if (!state.solution) {
+    handle_input(state, dt);
+  } else {
+    if (!state?.solution.length) {
+      delete state.solution;
+    } else {
+      state.angle.im +=
+        (state.solution[0] === "-" ? 1 : -1) * DEFAULTS.angle_multiplier * dt;
+
+      state = maybe_add_state_angle_move(state);
+
+      if (cx.eq(state.angle, new cx(0, 0))) state.solution.shift();
+    }
+  }
   render(state);
   requestAnimationFrame(loop);
 };
+
+const reset_state = ({ rows, cols } = state) => ({
+  ...state,
+  solution: null,
+  path: [new cx(0, 0), new cx(1, 0)],
+  angle: new cx(0, 0),
+});
 
 // DOM
 const on_resize = () => {
@@ -232,4 +263,14 @@ window.addEventListener("keyup", on_keyup);
 
 // main
 on_resize();
+state = reset_state(state);
+
+if (!sessionStorage.getItem("seen-instructions")) {
+  new Modal({
+    el: document.getElementById("directions-modal"),
+  }).show();
+
+  sessionStorage.setItem("seen-instructions", true);
+}
+
 requestAnimationFrame(loop);

@@ -1,4 +1,4 @@
-const DEPTH = 22;
+const DEPTH = 15;
 
 const DIRECTION = {
   0: new cx(0, 1),
@@ -13,7 +13,7 @@ const backtrack = (local_index, depth) =>
     .toString(2)
     .padStart(depth, "0")
     .split("")
-    .map((direction) => (Number(direction) ? "-" : "+"));
+    .map((direction) => (Number(direction) ? "+" : "-"));
 
 const sol = (target, start_from = new cx(0, 0), start_to = new cx(1, 0)) => {
   let moves = [start_to, ...construct_moves(start_from, start_to)];
