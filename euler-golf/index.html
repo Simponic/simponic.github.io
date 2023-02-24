@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Euler Golf 2</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <div class="controls" id="controls-container">
+      <div id="controls" style="display: none">
+        <div class="buttons">
+          <button id="reset">Reset</button>
+          <button id="solve">Solve</button>
+          <button id="directions">Directions</button>
+        </div>
+      </div>
+      <span id="expand-show">↑↑</span>
+    </div>
+
+    <div
+      id="directions-modal"
+      class="modal"
+      style="display: none"
+      tabindex="-1"
+      role="dialog"
+    >
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">X</span>
+      </button>
+
+      <div class="modal-body">
+        <div style="margin: 0; display: inline-block">
+          <h1 style="text-align: center">Euler Golf 2</h1>
+          <p>
+            Use the left and right arrow keys as navigation & hover over the
+            bottom right corner for controls.
+          </p>
+          <p>Rules</p>
+          <ul>
+            <li>
+              Every move consists of a 90 degree rotation around your last
+              position.
+            </li>
+            <li>You begin at the point one unit right from the center.</li>
+            <li>
+              The inital point that you rotate around is the origin (blue).
+            </li>
+            <li>You must navigate to the target point (green).</li>
+          </ul>
+          <p>
+            Initial game by
+            <a href="https://kylehovey.github.io/EulerGolf/">speleo</a>,
+            reimplemented & solved by
+            <a href="https://github.com/Simponic">simponic</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/modal-vanilla.min.js"></script>
+
+    <script src="js/cx.js"></script>
+    <script src="js/json-ds.js"></script>
+    <script src="js/sol.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/controls.js"></script>
+  </body>
+</html>

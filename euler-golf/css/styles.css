@@ -1,0 +1,74 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: scroll;
+  font-family: Lucida Console, Lucida Sans Typewriter, monaco,
+    Bitstream Vera Sans Mono, monospace;
+  width: 100vw;
+  height: 100vh;
+  background: rgb(238, 174, 202);
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 202, 1) 0%,
+    rgba(148, 187, 233, 1) 100%
+  );
+}
+
+.canvas {
+  padding: 0;
+  margin: auto;
+  display: block;
+  border: 1px solid black;
+
+  width: 100vw;
+  height: 100vw;
+}
+
+button {
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.controls {
+  cursor: pointer;
+  padding: 12px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid white;
+  border-radius: 8px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.modal {
+  display: flex;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 80vw;
+  max-width: 500px;
+  min-height: 200px;
+
+  padding: 12px;
+
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid black;
+  border-radius: 15px;
+}
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+}
