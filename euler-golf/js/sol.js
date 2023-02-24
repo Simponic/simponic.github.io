@@ -16,9 +16,14 @@ const backtrack = (local_index, depth) =>
     .map((direction) => (Number(direction) ? "+" : "-"));
 
 const sol = (target, start_from = new cx(0, 0), start_to = new cx(1, 0)) => {
-  let moves = [start_to, ...construct_moves(start_from, start_to)];
-  let curr_depth = 2;
+  const next_moves = construct_moves(start_from, start_to);
+  const solved_in_first_move = next_moves.findIndex((move) =>
+    cx.eq(move, target)
+  );
+  if (solved_in_first_move != -1) return backtrack(solved_in_first_move, 1);
 
+  let moves = [start_to, ...next_moves];
+  let curr_depth = 2;
   while (curr_depth < DEPTH) {
     for (let i = 0; i < Math.pow(2, curr_depth); i++) {
       const direction = DIRECTION[Number(i.toString(2).at(-1))];

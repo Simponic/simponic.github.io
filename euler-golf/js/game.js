@@ -46,7 +46,7 @@ CanvasRenderingContext2D.prototype.draw_cartesian_path = function (
   grid_spec,
   cartesian_path,
   width = 2,
-  color = "#000"
+  color = "#fff"
 ) {
   const path = cartesian_path.map((coord) => grid_to_canvas(coord, grid_spec));
   path.slice(1).forEach((coord, i) => {
@@ -168,7 +168,7 @@ const render = ({ width, height, ctx, rows, cols, target } = state) => {
       move(prev, curr, new cx(0, state.angle.im < 0 ? -1 : 1)),
     ].map((c) => grid_to_canvas(complex_to_grid(c, rows, cols), grid_spec));
 
-    ctx.line(a, b, 6, "#aaa");
+    ctx.line(a, b, 6, "rgba(127, 127, 127, 0.3)");
   }
 
   const grid_target = complex_to_grid(target, rows, cols);
@@ -182,7 +182,7 @@ const render = ({ width, height, ctx, rows, cols, target } = state) => {
     } else if (x == grid_target.x && y == grid_target.y) {
       return {
         radius: 8,
-        color: "#00ff00",
+        color: "#fff",
       };
     } else {
       return {
