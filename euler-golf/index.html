@@ -2,36 +2,15 @@
 <html>
   <head>
     <title>Euler Golf 2</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: scroll;
-        font-family: Lucida Console, Lucida Sans Typewriter, monaco,
-          Bitstream Vera Sans Mono, monospace;
-      }
-
-      .canvas-holder canvas {
-        padding: 0;
-        margin: auto;
-        display: block;
-        height: 70vh;
-        width: auto;
-        max-width: 100%;
-      }
-
-      .button {
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 5px;
-        cursor: pointer;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+    <div class="canvas-holder">
+      <canvas id="canvas" width="1000" height="1000"></canvas>
+    </div>
 
     <script src="js/cx.js"></script>
+    <script src="js/json-ds.js"></script>
     <script src="js/sol.js"></script>
     <script src="js/game.js"></script>
   </body>

@@ -1,4 +1,4 @@
-const DEPTH = 7;
+const DEPTH = 21;
 
 const DIRECTION = {
   0: new cx(0, 1),
@@ -6,39 +6,36 @@ const DIRECTION = {
 };
 
 const move = (prev, curr, c) => cx.add(prev, cx.mult(c, cx.sub(curr, prev)));
+
 const construct_moves = (curr, prev) =>
   Object.keys(DIRECTION).map((x) => move(curr, prev, DIRECTION[x]));
+
 const backtrack = (local_index, depth) =>
   local_index
     .toString(2)
     .padStart(depth, "0")
     .split("")
-    .reverse()
-    .map((dir) => (dir ? "+" : "-"));
+    .map((direction) => (Number(direction) ? "-" : "+"));
 
 const sol = (target, start_from = new cx(0, 0), start_to = new cx(1, 0)) => {
-  let moves = construct_moves(start_from, start_to);
-  let curr_depth = 2; // potential bug: when target is within one move away
+  let moves = [start_to, ...construct_moves(start_from, start_to)];
+  let curr_depth = 2;
 
-  do {
+  while (curr_depth < DEPTH) {
     for (let i = 0; i < Math.pow(2, curr_depth); i++) {
-      const current_i =
-        (i >> 1) + ((1 - Math.pow(2, curr_depth - 1)) / (1 - 2) - 1);
-      const previous_i =
-        (i >> 2) + ((1 - Math.pow(2, curr_depth - 2)) / (1 - 2) - 1);
+      const direction = DIRECTION[Number(i.toString(2).at(-1))];
+      // Current element is at i >> 1 + the offset for the previous group (which is
+      // the sum of the geometric series 2**n until curr_depth - 1)
+      const current_i = (i >> 1) + (1 - Math.pow(2, curr_depth - 1)) / (1 - 2);
+      const previous_i = (i >> 2) + (1 - Math.pow(2, curr_depth - 2)) / (1 - 2);
 
-      const new_move = move(
-        previous_i < 0 ? start_from : moves[previous_i],
-        moves[current_i],
-        DIRECTION[parseInt(i.toString(2)[0])]
-      );
-
-      if (cx.eq(new_move, target)) return backtrack(moves, target);
+      const new_move = move(moves[previous_i], moves[current_i], direction);
 
       moves.push(new_move);
+      if (cx.eq(new_move, target)) return backtrack(i, curr_depth);
     }
     curr_depth++;
-  } while (curr_depth < DEPTH);
-  console.log(moves);
+  }
+
   return null;
 };
