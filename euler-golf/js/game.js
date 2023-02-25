@@ -4,10 +4,12 @@ const DEFAULTS = {
   min_gap: 30,
   angle_multiplier: 10e-4,
 };
+
 const CANVAS = document.getElementById("canvas");
 
 let state = {
   grid_padding: 30,
+  gap: DEFAULTS.min_gap,
   canvas: CANVAS,
   ctx: CANVAS.getContext("2d"),
   last_render: 0,
@@ -87,8 +89,8 @@ const rand_between = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
 const rand_target = (rows, cols) => {
-  const r = Math.floor(rows / 2);
-  const c = Math.floor(cols / 2);
+  const r = Math.floor((rows - 1) / 2);
+  const c = Math.floor((cols - 1) / 2);
   const res = new cx(rand_between(-c, c), rand_between(-r, r));
   if (!sol(res)) return rand_target(rows, cols);
 
@@ -140,7 +142,7 @@ const handle_input = (state, dt) => {
   state = maybe_add_state_angle_move(state);
 };
 
-const render = ({ width, height, ctx, rows, cols, target } = state) => {
+const render = ({ width, height, ctx, rows, cols, target, gap } = state) => {
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = "rgba(0, 0, 0, 0)";
   ctx.fillRect(0, 0, width, height);
@@ -172,7 +174,6 @@ const render = ({ width, height, ctx, rows, cols, target } = state) => {
   }
 
   const grid_target = complex_to_grid(target, rows, cols);
-
   ctx.cartesian_grid(rows, cols, grid_spec, (x, y) => {
     if (x == Math.floor(cols / 2) && y == Math.floor(rows / 2)) {
       return {
@@ -191,6 +192,9 @@ const render = ({ width, height, ctx, rows, cols, target } = state) => {
       };
     }
   });
+
+  // Render gap value in slider
+  document.getElementById("gap").value = gap;
 };
 
 const loop = (now) => {
@@ -198,23 +202,17 @@ const loop = (now) => {
   state.changes.last_render = now;
 
   if (Object.keys(state.changes).length > 0) {
-    if (state.changes.width || state.changes.height) {
-      state.changes.rows = Math.floor(
-        Math.min(DEFAULTS.max_rows, state.changes.height / DEFAULTS.min_gap)
-      );
-      state.changes.cols = Math.floor(
-        Math.min(DEFAULTS.max_cols, state.changes.width / DEFAULTS.min_gap)
-      );
-    }
-
     state = { ...state, ...state.changes };
+
+    if (state.changes.width || state.changes.height || state.changes.gap) {
+      state.rows = Math.floor(state.height / state.gap);
+      state.cols = Math.floor(state.width / state.gap);
+    }
 
     state.changes = {};
   }
 
-  if (!state.target) {
-    state.target = rand_target(state.rows, state.cols);
-  }
+  if (!state.target) state.target = rand_target(state.rows, state.cols);
 
   if (!state.solution) {
     handle_input(state, dt);
@@ -242,6 +240,10 @@ const reset_state = ({ rows, cols } = state) => ({
 });
 
 // DOM
+const directions_modal = new Modal({
+  el: document.getElementById("directions-modal"),
+});
+
 const on_resize = () => {
   CANVAS.width = document.body.clientWidth;
   CANVAS.height = document.body.clientHeight;
@@ -266,10 +268,7 @@ on_resize();
 state = reset_state(state);
 
 if (!sessionStorage.getItem("seen-instructions")) {
-  new Modal({
-    el: document.getElementById("directions-modal"),
-  }).show();
-
+  directions_modal.show();
   sessionStorage.setItem("seen-instructions", true);
 }
 

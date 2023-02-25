@@ -1,13 +1,10 @@
-const directions_modal = new Modal({
-  el: document.getElementById("directions-modal"),
-});
-
 document
   .getElementById("controls-container")
   .addEventListener("mouseover", () => {
     document.getElementById("controls").style.display = "block";
     document.getElementById("expand-show").style.display = "none";
   });
+
 document
   .getElementById("controls-container")
   .addEventListener("mouseout", () => {
@@ -30,3 +27,7 @@ document.getElementById("solve").addEventListener("click", () => {
 document
   .getElementById("directions")
   .addEventListener("click", () => directions_modal.show());
+
+document.getElementById("gap").addEventListener("input", function () {
+  state.changes.gap = Number(this.value);
+});
