@@ -65,7 +65,7 @@ const makeSvg = (coords) => {
 
   return `
     <svg xmlns='http://www.w3.org/2000/svg' width='${window.innerWidth}px' height='${window.innerHeight}px'>
-      <rect x="0" y="0" width="${window.innerWidth}" height="${window.innerHeight}" fill="black"/>
+      <rect x="0" y="0" width="${window.innerWidth}" height="${window.innerHeight}" fill="${document.body.style.backgroundColor || "black"}"/>
       ${coords.map((_,i) => {
         if (i == 0) {
           return;
