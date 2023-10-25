@@ -1,16 +1,9 @@
 class TuringMachine {
-  constructor(
-    tape = [],
-    rules = [],
-    initialState = "q0",
-    blankSymbol = "B",
-    acceptState = "f"
-  ) {
+  constructor(tape = [], rules = [], initialState = "q0", acceptState = "f") {
     this.tape = tape;
     this.rules = this.parseRules(rules);
     this.state = initialState;
     this.head = 0;
-    this.blankSymbol = blankSymbol;
     this.acceptState = acceptState;
 
     this.iteration = 0;
@@ -51,7 +44,7 @@ class TuringMachine {
   }
 
   step() {
-    const currentSymbol = this.tape[this.head] || this.blankSymbol;
+    const currentSymbol = this.tape[this.head];
     const key = `${this.state},${currentSymbol}`;
     if (!(key in this.rules)) {
       return false;
@@ -60,6 +53,7 @@ class TuringMachine {
     const [newState, action] = rule.split(",");
 
     this.state = newState;
+    this.iteration++;
 
     if (action === "R") {
       this.head += 1;
@@ -73,10 +67,6 @@ class TuringMachine {
       return false;
     }
 
-    if (this.head >= 0 && this.head < this.tape.length) {
-      this.iteration++;
-      return true;
-    }
-    return false;
+    return this.head >= 0 && this.head < this.tape.length;
   }
 }

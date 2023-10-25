@@ -1,3 +1,7 @@
+const TAPE_LEN = 150;
+const BLANK_VAL = "B";
+const SIMULATION_INTERVAL = 200;
+
 const MESSAGES = {
   SET_CELL: "SET_CELL",
   PAUSE: "PAUSE",
@@ -9,16 +13,13 @@ const MESSAGES = {
   NEW_TURING_STATE: "NEW_TURING_STATE",
 };
 
+// -- the "real" code
+
 const state = new Observable();
 
 const inputCellId = (cellId) => `${cellId}-input`;
 
-const setCellFromInput = (cellId, inputId) => {
-  const input = document.getElementById(inputId);
-  tape[cellId] = input.value;
-};
-
-const cell = (cellId, initValue = "NULL") => {
+const cell = (cellId, initValue = "B") => {
   const cellDiv = document.createElement("div");
   cellDiv.classList.add("cell");
   cellDiv.id = cellId;
@@ -38,7 +39,8 @@ const cell = (cellId, initValue = "NULL") => {
   input.addEventListener("focusout", () =>
     state.notify({ type: MESSAGES.SET_CELL, cell: cellId, value: input.value })
   );
-  state.subscribe((msg) => {
+
+  const msgListener = (msg) => {
     if (msg.type == MESSAGES.SET_CELL && msg.cell == cellId) {
       input.value = msg.value;
     }
@@ -50,7 +52,11 @@ const cell = (cellId, initValue = "NULL") => {
         });
       } else cellDiv.classList.remove("reading");
     }
-  });
+    if (msg.type == MESSAGES.COMPILE) {
+      state.unsubscribe(msgListener);
+    }
+  };
+  state.subscribe(msgListener);
 
   cellDiv.appendChild(input);
   cellDiv.appendChild(readingHead);
@@ -73,7 +79,7 @@ const parseRules = (rules, beginState) => {
       .map((x) => x.trim())
       .filter((x) => x);
     if (items.length != 4) {
-      throw new Error(`Invalid instruction on line ${line}`);
+      throw new Error(`Invalid instruction on line ${line + 1}`);
     }
     instructions.push(items);
   });
@@ -85,38 +91,74 @@ const parseRules = (rules, beginState) => {
   return instructions;
 };
 
-// --
+// -- a bit of some hacky ui code --
 
 const tapeEl = document.getElementById("tape");
 const compileButton = document.getElementById("compile");
-const instructionsEl = document.getElementById("instructions");
+const resetButton = document.getElementById("reset");
 const controlsEl = document.getElementById("controls");
 const nextStepButton = document.getElementById("next_step");
 const togglePlayButton = document.getElementById("toggle_play");
 const compileStatusEl = document.getElementById("compile_status");
 const turingMachineStateEl = document.getElementById("turing_state");
-const resetButton = document.getElementById("reset");
+const copyStateButton = document.getElementById("copy_state");
 
-resetButton.addEventListener("click", () => {
-  state.notify({ type: MESSAGES.PAUSE });
-  state.notify({ type: MESSAGES.COMPILE, value: instructionsEl.value });
+// init instructions from params
+const instructionsEl = document.getElementById("instructions");
+const editorEl = CodeMirror.fromTextArea(instructionsEl, {
+  lineNumbers: true,
 });
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("instructions")) {
+  editorEl.setValue(atob(urlParams.get("instructions")));
+}
 
-compileButton.addEventListener("click", () => {
-  state.notify({ type: MESSAGES.COMPILE, value: instructionsEl.value });
-});
+[compileButton, resetButton].forEach((button) =>
+  button.addEventListener("click", () => {
+    state.notify({ type: MESSAGES.PAUSE });
+    state.notify({ type: MESSAGES.COMPILE, value: editorEl.getValue() });
+  })
+);
 
 nextStepButton.addEventListener("click", () => {
   state.notify({ type: MESSAGES.PAUSE });
   state.notify({ type: MESSAGES.NEXT_STEP });
 });
 
+// hackily copy the program state and put it in the clipboard
+copyStateButton.addEventListener("click", () => {
+  const start = Array(TAPE_LEN)
+    .fill(BLANK_VAL)
+    .map((blank, i) => document.getElementById(inputCellId(i))?.value ?? blank)
+    .join("")
+    .replaceAll(new RegExp(`(${BLANK_VAL})*\$`, "g"), "");
+  const instructions = btoa(editorEl.getValue());
+
+  navigator.clipboard
+    .writeText(
+      window.location.href.split("?")[0] +
+        `?start=${start}&instructions=${instructions}`
+    )
+    .then(() => alert("copied to clipboard"));
+});
+
+// simulate / pause button
 let playButton_simulationStatus = "paused";
 togglePlayButton.addEventListener("click", function () {
   if (playButton_simulationStatus == "paused") {
     state.notify({ type: MESSAGES.SIMULATE });
   } else if (playButton_simulationStatus == "simulate") {
     state.notify({ type: MESSAGES.PAUSE });
+  }
+});
+state.subscribe((msg) => {
+  if (msg.type == MESSAGES.PAUSE) {
+    togglePlayButton.innerHTML = "🔁 Begin";
+    playButton_simulationStatus = "paused";
+  }
+  if (msg.type == MESSAGES.SIMULATE) {
+    togglePlayButton.innerHTML = "⏸️ Pause";
+    playButton_simulationStatus = "simulate";
   }
 });
 
@@ -142,19 +184,8 @@ state.subscribe((msg) => {
     if (error) {
       controlsEl.style.display = "none";
     } else if (success) {
-      controlsEl.style.display = "block";
+      controlsEl.style.display = "flex";
     }
-  }
-});
-
-state.subscribe((msg) => {
-  if (msg.type == MESSAGES.PAUSE) {
-    togglePlayButton.innerHTML = "🔁 Begin";
-    playButton_simulationStatus = "paused";
-  }
-  if (msg.type == MESSAGES.SIMULATE) {
-    togglePlayButton.innerHTML = "⏸️ Pause";
-    playButton_simulationStatus = "simulate";
   }
 });
 
@@ -167,35 +198,35 @@ state.subscribe((msg) => {
 // -
 
 const main = () => {
-  const blank = "B";
-  const beginState = "q0";
-  const acceptState = "f";
-  const tape = Array(200).fill(blank);
-  const cells = tape.map((_, cellId) => cell(cellId, blank));
-  for (const cell of cells) {
-    tapeEl.appendChild(cell);
-  }
-
   let turingMachine;
+  const startString = urlParams.get("start");
 
   state.subscribe((msg) => {
     if (msg.type == MESSAGES.SET_CELL) {
       const { value, cell } = msg;
-      tape[cell] = value;
       if (turingMachine) turingMachine.setTapeAtCell(cell, value);
     }
     if (msg.type == MESSAGES.COMPILE) {
       const { value } = msg;
       try {
-        const rules = parseRules(value, beginState, acceptState);
+        const beginState = "q0";
+        const acceptState = "f";
+        const tape = Array(TAPE_LEN)
+          .fill(BLANK_VAL)
+          .map((x, i) =>
+            startString && i < startString.length ? startString[i] : x
+          );
 
-        turingMachine = new TuringMachine(
-          [...tape],
-          rules,
-          beginState,
-          blank,
-          acceptState
-        );
+        // put the cells into the tape
+        const cells = tape.map((_, cellId) => cell(cellId, tape[cellId]));
+        tapeEl.innerHTML = "";
+        for (const cell of cells) {
+          tapeEl.appendChild(cell);
+        }
+
+        const rules = parseRules(value, beginState, acceptState);
+        turingMachine = new TuringMachine(tape, rules, beginState, acceptState);
+
         state.notify({ type: MESSAGES.SET_READER, cell: 0 });
         state.notify({
           type: MESSAGES.NEW_TURING_STATE,
@@ -209,7 +240,7 @@ const main = () => {
     if (msg.type == MESSAGES.SIMULATE) {
       const interval = setInterval(() => {
         state.notify({ type: MESSAGES.NEXT_STEP });
-      }, 300);
+      }, SIMULATION_INTERVAL);
       const subscriptionFn = (msg) => {
         if (msg.type == MESSAGES.PAUSE) {
           clearInterval(interval);
@@ -231,7 +262,7 @@ const main = () => {
           type: MESSAGES.NEW_TURING_STATE,
           value: accepting
             ? `<span class='success'>Accept(${status})</span>`
-            : `<span class='error'>Fail(${status}}</span>`,
+            : `<span class='error'>Fail(${status})</span>`,
         });
       } else {
         state.notify({

@@ -1,29 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Turing Machine Simulator</title>
-  <link rel="stylesheet" type="text/css" href="css/styles.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Simponic's State System</h1>
-    <p>Author: Elizabeth Hunt</p>
-    <hr>
-    <p id="turing_state">State: _</p>
-    <div id="tape" class="tape"></div>
-    <div class="controls" id="controls" style="display: none">
-      <button id="next_step">Next Step</button> <button id=
-      "toggle_play">🔁 Begin</button> <button id=
-      "reset">Reset</button><br>
+  <head>
+    <title>Turing Machine Simulator</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="codemirror/codemirror.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Simponic's State System</h1>
+      <p><i>Developed for Kulyukin's CS5000</i></p>
+      <hr />
+      <p id="turing_state">State: _</p>
+      <div id="tape" class="tape"></div>
+      <div class="controls" id="controls">
+        <button id="toggle_play">🔁 Begin</button>
+        <button id="next_step">Next Step</button>
+        <button id="reset">Reset</button><br />
+      </div>
+      <div class="textarea-container">
+        <ul>
+          <li>
+            must have some instruction quadruple with the start state "q0"
+          </li>
+          <li>all computations will fail unless they end on the state "f"</li>
+          <li>
+            instructions are delimited with line breaks and are in the form
+            <i
+              >"< from_state > < read_symbol > < L/R/write_symbol > < to_state
+              >"</i
+            >
+          </li>
+          <li>comments ("//") are ignored</li>
+        </ul>
+        <textarea id="instructions">
+// replaces 3 B's with "1"
+q0 B 1 q1
+q1 1 R q1
+q1 B 1 q2
+q2 1 R q2
+q2 B 1 f</textarea
+        >
+        <div>
+          <button id="compile">Compile</button
+          ><span style="margin-left: 0.5rem" id="compile_status"></span>
+        </div>
+        <div>
+          <button id="copy_state">Copy State</button>
+        </div>
+      </div>
     </div>
-    <textarea id="instructions">test</textarea>
-    <div>
-      <button id="compile">Compile</button><span style=
-      "margin-left: 0.5rem" id="compile_status"></span>
-    </div>
-  </div>
-  <script src="js/observable.js"></script> 
-  <script src="js/turing_machine.js"></script> 
-  <script src="js/main.js"></script>
-</body>
+    <script src="codemirror/codemirror.js"></script>
+    <script src="js/observable.js"></script>
+    <script src="js/turing_machine.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>
