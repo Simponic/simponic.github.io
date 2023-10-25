@@ -7,8 +7,23 @@
 <body>
   <div class="container">
     <h1>Simponic's State System</h1>
+    <p>Author: Elizabeth Hunt</p>
+    <hr>
+    <p id="turing_state">State: _</p>
     <div id="tape" class="tape"></div>
+    <div class="controls" id="controls" style="display: none">
+      <button id="next_step">Next Step</button> <button id=
+      "toggle_play">🔁 Begin</button> <button id=
+      "reset">Reset</button><br>
+    </div>
+    <textarea id="instructions">test</textarea>
+    <div>
+      <button id="compile">Compile</button><span style=
+      "margin-left: 0.5rem" id="compile_status"></span>
+    </div>
   </div>
+  <script src="js/observable.js"></script> 
+  <script src="js/turing_machine.js"></script> 
   <script src="js/main.js"></script>
 </body>
 </html>
