@@ -3,7 +3,7 @@ const MAX_ZOOM = 4;
 const C_THRESHOLD = Math.sqrt(2)/2;
 const SLIDER_DIV = 2000*C_THRESHOLD;
 
-const gpu = new GPU();
+const gpu = new GPUX();
 const buildRender = (width, height) => gpu.createKernel(function (maxIterations, cr, ci, centerX, centerY, zoom, colorMultipliers) {
   let zx = (this.output.x / this.output.y) * (centerX + (4 * this.thread.x / this.output.x - 2) * (zoom / 4));
   let zy = centerY + (4 * this.thread.y / this.output.y - 2) * (zoom / 4);
