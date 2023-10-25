@@ -1,0 +1,90 @@
+* {
+  font-family: "Trebuchet MS", sans-serif;
+}
+
+button {
+  background: #bbbbbb;
+  border: 1px solid white;
+  border-radius: 0.2rem;
+  padding: 0.2rem;
+}
+
+button:hover {
+  background: #cccccc;
+}
+
+body {
+  margin: 0;
+  background-color: #aaaaaa;
+}
+
+.container {
+  display: flex;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+
+  padding: 2rem;
+}
+
+.tape {
+  display: flex;
+
+  padding: 1rem;
+
+  align-items: center;
+  gap: 1rem;
+
+  height: 5rem;
+  max-width: 100%;
+
+  border: 1px solid black;
+
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.cell {
+  position: relative;
+  height: 80%;
+  border: 3px solid black;
+  transition: border 0.1s ease-in-out;
+  transition: background 0.1s ease-in-out;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  gap: 0.2rem;
+
+  padding: 0.2rem;
+}
+
+.circle {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: wheat;
+  border-radius: 50%;
+  opacity: 0.001;
+  transition: opacity 0.1s ease-in-out;
+}
+
+.cell.reading .circle {
+  opacity: 1;
+}
+
+.reading {
+  border-color: green;
+  background-color: wheat;
+}
+
+.cell-input {
+  width: 50px;
+  text-align: center;
+}
