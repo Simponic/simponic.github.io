@@ -95,10 +95,9 @@ body {
 }
 
 .cell-input {
-  border: none;
   border-radius: 0.25rem;
 
-  background-color: 1px solid #ccc;
+  border: 2px dotted #333;
   width: 50px;
   margin-left: 0.25rem;
   margin-right: 0.25rem;
