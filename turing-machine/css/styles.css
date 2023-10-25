@@ -1,0 +1,144 @@
+* {
+  margin: 0;
+}
+
+button {
+  background: #bbbbbb;
+  border: 1px solid white;
+  border-radius: 0.2rem;
+  padding: 0.3rem;
+  display: inline-block;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #cccccc;
+}
+
+body {
+  font-family: "Trebuchet MS", sans-serif;
+  background-color: #aaaaaa;
+}
+
+.container {
+  display: flex;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  gap: 1rem;
+
+  padding: 2rem;
+}
+
+.tape {
+  border-radius: 0.25rem;
+  box-shadow: 5px 5px 5px #666666;
+
+  display: flex;
+
+  padding: 1rem;
+
+  align-items: center;
+  gap: 1rem;
+
+  height: 5rem;
+  max-width: 100%;
+
+  border: 2px solid white;
+
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.cell {
+  border-radius: 0.25rem;
+  box-shadow: 2px 2px 5px #666666;
+  background-color: #dddddd;
+  border: 2px solid white;
+
+  position: relative;
+  height: 80%;
+  transition: border 0.25s ease-in-out;
+  transition: background 0.25s ease-in-out;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  gap: 0.2rem;
+
+  padding: 0.2rem;
+}
+
+.circle {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  background-color: wheat;
+  border-radius: 50%;
+  opacity: 0.001;
+  transition: opacity 0.25s ease-in-out;
+}
+
+.cell.reading .circle {
+  opacity: 1;
+}
+
+.reading {
+  border-color: wheat;
+  background-color: wheat;
+}
+
+.cell-input {
+  border: none;
+  border-radius: 0.25rem;
+
+  background-color: 1px solid #ccc;
+  width: 50px;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+
+  text-align: center;
+  font-size: 1rem;
+}
+
+.textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 5px 5px 5px #666666;
+  border: 2px solid white;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+textarea {
+  border-radius: 0.25rem;
+  height: 50vh;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+.controls {
+  display: none;
+  gap: 1rem;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+}
+
+hr {
+  border-top: 2px solid black;
+  border-bottom: none;
+}
