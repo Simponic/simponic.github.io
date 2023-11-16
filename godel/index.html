@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>L-Program Compiler</title>
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+  <link rel="stylesheet" type="text/css" href=
+  "codemirror/codemirror.css">
+</head>
+<body>
+  <div class="container">
+    <h1>L-Program Compiler</h1>
+    <p><i>Developed for Kulyukin's CS5000</i></p>
+    <hr>
+    <div class="textarea-container">
+      <textarea id="instructions">// asdf
+q0 B 1 q1
+q1 1 R q1
+q1 B 1 q2
+q2 1 R q2
+q2 B 1 f</textarea>
+      <div>
+        <button id="compile">Compile</button><span style=
+        "margin-left: 0.5rem" id="compile_status"></span>
+      </div>
+      <div>
+        <button id="copy_state">Copy State</button>
+      </div>
+    </div>
+  </div>
+  <script src="codemirror/codemirror.js"></script> 
+  <script src="js/observable.js"></script> 
+  <script src="js/parser.js"></script> 
+  <script src="js/main.js"></script>
+</body>
+</html>

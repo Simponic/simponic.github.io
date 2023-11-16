@@ -1,0 +1,48 @@
+Program = instructions: Line* {
+  return { instructions: instructions };
+}
+
+Line = instruction: (LabeledInstruction / Instruction) _ {
+  return instruction;
+}
+
+LabeledInstruction = label:Label _ instruction:Instruction {
+  return { label, instruction };
+}
+
+Label = "[" _? label:LABEL_V _? "]" {
+  return label;
+}
+  
+Instruction = conditional: Conditional { return { conditional }; } 
+  / assignment: Assignment { return { assignment }; }
+
+Conditional = "IF" _ variable: VAR  _ "!=" _ "0" _ "GOTO" _ label: Label {
+  return { variable, label };
+}
+
+Assignment = variable: VAR _ "<-" _ expr: Expression {
+  if (expr.left != variable) {
+    error("left hand variable must match right hand");
+  }
+  return { variable, expr };
+}
+
+Expression = left: VAR _ opr: OPERATION _ "1" {
+  return { left, opr };
+}
+
+VAR = symbol:"Y" { return symbol } / symbol:("X" / "Z") ind:Integer+ {
+  return symbol + ind;
+}
+
+OPERATION = "+" / "-"
+
+LABEL_V = symbol:[A-E] ind:Integer+ {
+  return symbol + ind;
+}
+
+Integer "integer"
+  = _ [0-9]+ { return parseInt(text(), 10); }
+
+_ "whitespace" = [ \t\n\r]* {  }
