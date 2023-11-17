@@ -17,19 +17,21 @@
         <textarea id=
         "instructions">// 0. primitive instructions only
 // 1. labels match the regex [A-E](:digit:)+.
-// 2. variables are initialized to zero
-//    and match (Y | (X|Z)(:digit:)+).
+// 2. variables are initialized to zero and match 
+//    (Y | (X|Z)(:digit:)+).
 // 3. instructions must be delimited by a newline.
 // 4. anything following the comment token "//" up to a
 //    newline are ignored.
 // 5. by default, a computation that takes more than 500_000
 //    "procedures", it will be halted.
-// 6. the implicit exit label "E" exists; thus to exit
-//    prematurely, "GOTO E".
+// 6. the implicit exit label "E1" exists; thus to exit
+//    prematurely, "GOTO E1".
 // 7. input your initial snapshot in the "variables" map
 //    on the Program in the compiled JS output
 // 8. for a more detailed view on the grammar, it's at
 //    /godel/grammar.peg
+
+// THIS PROGRAM COMPUTES X1 + X2
 
 // Y &lt;- X1
 [ A1 ] IF X1 != 0 GOTO A2
@@ -47,7 +49,7 @@
 
 // Y &lt;- Y + Z1
 [ C1 ] IF Z1 != 0 GOTO C2
-       GOTO E
+       GOTO E1
 [ C2 ] Z1 &lt;- Z1 - 1
        Y &lt;- Y + 1
        GOTO C1</textarea>
@@ -70,6 +72,17 @@
           "eval_status"></span>
         </div>
       </div>
+    </div>
+    <div class="textarea-container">
+      <h3>Godel</h3>
+      <p>Sequence:</p>
+      <pre id="godel_sequence"></pre>
+      <div>
+        <p>Number: <button id="godel_number_comp" style=
+        "display: none">Compute (this might take a
+        while)</button></p>
+      </div>
+      <pre id="godel_number"></pre>
     </div>
   </div>
   <script src="codemirror/codemirror.js"></script> 

@@ -18,15 +18,19 @@ const main = () => {
     if (msg.type == MESSAGES.COMPILE) {
       const { value } = msg;
       const source = prepareSource(value);
+
       try {
         const ast = parser.parse(source);
-        const program = compile(ast);
+        const { js, godelSequence } = compile(ast);
 
         state.notify({
           type: MESSAGES.COMPILE_RESULT,
-          value: program,
+          success: true,
+          js,
+          godelSequence,
         });
       } catch (e) {
+        console.error(e);
         state.notify({
           type: MESSAGES.COMPILE_RESULT,
           error: e.toString(),
@@ -39,6 +43,7 @@ const main = () => {
         const result = eval(source);
         state.notify({
           type: MESSAGES.EVAL_RESULT,
+          success: true,
           value: result,
         });
       } catch (e) {
@@ -54,33 +59,46 @@ main();
 
 // -- a bit of some hacky ui code --
 
-const instructionsEl = document.getElementById("instructions");
-const instructionsEditorEl = CodeMirror.fromTextArea(instructionsEl, {
+const codeMirrorConfig = {
   lineNumbers: true,
-});
+};
+const instructionsEl = document.getElementById("instructions");
+const instructionsEditorEl = CodeMirror.fromTextArea(
+  instructionsEl,
+  codeMirrorConfig
+);
 
 const compileButton = document.getElementById("compile");
 const evalButton = document.getElementById("eval");
 const evalStatusEl = document.getElementById("eval_status");
 const compileStatusEl = document.getElementById("compile_status");
 const compiledEl = document.getElementById("compiled");
-const compiledEditorEl = CodeMirror.fromTextArea(compiledEl, {
-  lineNumbers: true,
-});
+const compiledEditorEl = CodeMirror.fromTextArea(compiledEl, codeMirrorConfig);
+const godelSequenceEl = document.getElementById("godel_sequence");
+const godelNumberEl = document.getElementById("godel_number");
+const godelNumberComputeBtn = document.getElementById("godel_number_comp");
+
 state.subscribe((msg) => {
   if (msg.type == MESSAGES.COMPILE_RESULT) {
     evalStatusEl.classList.remove("error");
     evalStatusEl.classList.remove("success");
     evalStatusEl.innerHTML = "";
 
-    if (typeof msg.value !== "undefined") {
-      compiledEditorEl.setValue(msg.value);
+    if (msg.success) {
+      const { js, godelSequence } = msg;
+      compiledEditorEl.setValue(js);
+
+      godelSequenceEl.innerHTML = `[${godelSequence.join(", ")}]`;
+      godelNumberComputeBtn.style.display = "inline";
 
       compileStatusEl.classList.add("success");
       compileStatusEl.classList.remove("error");
       compileStatusEl.innerHTML = `Successful compile at ${new Date().toLocaleString()}!`;
     } else if (msg.error) {
       compiledEditorEl.setValue("");
+      godelSequenceEl.innerHTML = "";
+      godelNumberEl.innerHTML = "";
+      godelNumberComputeBtn.style.display = "none";
 
       compileStatusEl.classList.remove("success");
       compileStatusEl.classList.add("error");
@@ -88,9 +106,33 @@ state.subscribe((msg) => {
     }
   }
 });
+
+state.subscribe((msg) => {
+  if (msg.type == MESSAGES.COMPILE_RESULT) {
+    if (msg.success) {
+      const { godelSequence } = msg;
+
+      godelNumberComputeBtn.onclick = () => {
+        godelNumberEl.innerHTML = "working...";
+
+        const worker = new Worker("js/godelWorker.js");
+
+        worker.addEventListener("message", (e) => {
+          const godelNumber = e.data;
+          godelNumberEl.innerHTML = godelNumber.toString();
+        });
+
+        worker.postMessage(godelSequence);
+      };
+    } else if (msg.error) {
+      godelNumberComputeBtn.onclick = () => {};
+    }
+  }
+});
+
 state.subscribe((msg) => {
   if (msg.type == MESSAGES.EVAL_RESULT) {
-    if (typeof msg.value !== "undefined") {
+    if (msg.success) {
       evalStatusEl.classList.add("success");
       evalStatusEl.classList.remove("error");
       evalStatusEl.innerHTML = `Result: ${msg.value}`;

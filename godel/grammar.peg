@@ -1,9 +1,17 @@
-Program = lines: (Line / (_/[\n]))* {
+Program = lines: (ProgramInstruction / (_/[\n]))* {
   return { instructions: lines.filter((line) => typeof line !== "string" || line.trim() != "") };
 }
 
-Line = _? instruction: (LabeledInstruction / Instruction) _? [\n]? {
-  return instruction;
+ProgramInstruction = _? instruction: (LabeledInstruction / Instruction) _? [\n]? {
+  let x = 0;
+  let y = 0;
+  if (instruction.label) {
+    x = instruction.label.godel;
+    y = instruction.instruction.godel;
+  } else {
+    y = instruction.godel;
+  }
+  return { instruction, godel: ((2 ** x) * ((2 * y) + 1) - 1) };
 }
 
 LabeledInstruction = label:Label _ instruction:Instruction {
@@ -14,33 +22,41 @@ Label = "[" _? label:LABEL_V _? "]" {
   return label;
 }
   
-Instruction = conditional: Conditional { return { conditional }; } 
-  / assignment: Assignment { return { assignment }; }
-  / goto: Goto { return { goto }; }
+Instruction = conditional: Conditional { return { conditional, godel: conditional.godel }; } 
+  / assignment: Assignment { return { assignment, godel: assignment.godel }; }
+  / goto: Goto { return { goto, godel: goto.godel }; }
 
 Goto = GOTO _ label: LABEL_V {
-  return { label };
+  return { label, godel: label.godel + 2 };
 }
 
 Conditional = "IF" _ variable: VAR  _? "!=" _? "0" _ goto: Goto {
-  return { variable, goto };
+  const y = variable.godel - 1;
+  const x = goto.godel;
+  return { variable, goto, godel: ((2 ** x) * ((2 * y) + 1) - 1) };
 }
 
 Assignment = variable: VAR _ "<-" _ expr: Expression {
-  if (expr.left != variable) {
+  if (expr.left.symbol != variable.symbol) {
     error("left hand variable must match right hand");
   }
-  return { variable, expr };
+  const x = expr.instructionNumber;
+  const y = variable.godel - 1;
+  return { variable, expr, godel: ((2 ** x) * ((2 * y) + 1) - 1) };
 }
 
 Expression = left: VAR _ opr: OPERATION _ "1" {
-  return { left, opr };
+  const instructionNumber = { "+" : 1, "-" : 2 }[opr];
+  return { left, opr, instructionNumber };
 } / left: VAR  {
-  return { left };
+  return { left, instructionNumber: 0 };
 }
 
-VAR = symbol:"Y" { return symbol } / symbol:("X" / "Z") ind:Integer+ {
-  return symbol + ind;
+VAR = symbol:"Y" { return { symbol, godel: 1 }; } / symbol:("X" / "Z") ind:Integer+ {
+  const index = parseInt(ind);
+  const order = ["X", "Z"];
+  const godel = index * order.length + order.indexOf(symbol);
+  return { symbol: symbol + ind, godel };
 }
 
 GOTO = "GOTO"
@@ -48,10 +64,12 @@ GOTO = "GOTO"
 OPERATION = "+" / "-"
 
 LABEL_V = symbol:END_LABEL { return symbol } / symbol:[A-E] ind:Integer+ {
-  return symbol + ind;
+  const index = parseInt(ind);
+  const godel = (symbol.charCodeAt(0) - "A".charCodeAt(0) + 1) + 5*(index-1);
+  return { symbol: symbol + ind, godel };
 }
 
-END_LABEL = "E"
+END_LABEL = "E1"
 
 Integer "integer"
   = [0-9]+ { return parseInt(text(), 10); }

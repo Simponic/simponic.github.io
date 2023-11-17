@@ -11,11 +11,14 @@ class StringBuilder {
 }
 
 const compileGoto = (gotoNode, stringBuilder) => {
-  stringBuilder.add(`this.followGoto("${gotoNode.label}");\nreturn;\n`);
+  stringBuilder.add(`this.followGoto("${gotoNode.label.symbol}");\nreturn;\n`);
 };
 
 const compileConditional = (conditionalNode, stringBuilder) => {
-  const { variable, goto: gotoNode } = conditionalNode;
+  const {
+    variable: { symbol: variable },
+    goto: gotoNode,
+  } = conditionalNode;
 
   stringBuilder.add(`if (this.get("${variable}") != 0) {\n`);
   compileGoto(gotoNode, stringBuilder);
@@ -23,7 +26,10 @@ const compileConditional = (conditionalNode, stringBuilder) => {
 };
 
 const compileAssignment = (assignmentNode, stringBuilder) => {
-  const { variable, expr } = assignmentNode;
+  const {
+    variable: { symbol: variable },
+    expr,
+  } = assignmentNode;
   if (expr.opr) {
     if (expr.opr == "+") stringBuilder.add(`this.addOne("${variable}");\n`);
     else if (expr.opr == "-")
@@ -49,6 +55,8 @@ const compileInstruction = (instruction, stringBuilder) => {
 };
 
 const compile = (ast) => {
+  const godelSequence = [];
+
   const stringBuilder = new StringBuilder();
   stringBuilder.add(`
     class Program {
@@ -65,8 +73,8 @@ const compile = (ast) => {
         this.finalInstruction = ${
           ast.instructions.length + 1
         }; // instruction of the implied "exit" label
-        // "E" is the exit label
-        this.labelInstructions.set("E", this.finalInstruction); 
+        // "E1" is the exit label
+        this.labelInstructions.set("E1", this.finalInstruction); 
       }
 
       get(variable) {
@@ -122,25 +130,31 @@ const compile = (ast) => {
 
   stringBuilder.add("// -- build label -> instruction map --\n");
   for (let i = 0; i < ast.instructions.length; i++) {
-    const line = ast.instructions[i];
+    const instruction = ast.instructions[i];
+    godelSequence.push(instruction.godel);
+
+    const line = instruction.instruction;
     const instructionIdx = i + 1;
     if (line.label) {
+      const symbol = line.label.symbol;
       stringBuilder.add(
-        `this.instructions.set(${instructionIdx}, () => this.${line.label}());\n`
+        `this.instructions.set(${instructionIdx}, () => this.${symbol}());\n`
       );
       stringBuilder.add(
-        `this.labelInstructions.set("${line.label}", ${instructionIdx});\n`
+        `this.labelInstructions.set("${symbol}", ${instructionIdx});\n`
       );
     }
   }
 
   stringBuilder.add("// -- compiled instructions --\n");
   for (let i = 0; i < ast.instructions.length; i++) {
-    let instruction = ast.instructions[i];
+    let instruction = ast.instructions[i].instruction;
     const instructionIdx = i + 1;
     if (instruction.label) {
+      const symbol = instruction.label.symbol;
+
       stringBuilder.add(
-        `  this.followGoto("${instruction.label}");\n}\n\n${instruction.label}() {\n`
+        `  this.followGoto("${symbol}");\n}\n\n${symbol}() {\n`
       );
       stringBuilder.add(`this.instructionPointer = ${instructionIdx};\n`);
       instruction = instruction.instruction;
@@ -152,14 +166,17 @@ const compile = (ast) => {
   stringBuilder.add(`  }\n}\n`);
   stringBuilder.add("// -- \n");
   stringBuilder.add("const program = new Program();\n\n");
-  stringBuilder.add("// set the initial Snapshot here\n");
+  stringBuilder.add("// !! set the initial Snapshot here !!\n");
   stringBuilder.add('// program.variables.set("X1", 2);\n\n');
   stringBuilder.add("program.run();\n");
   stringBuilder.add("console.log(program.variables);\n");
   stringBuilder.add("program.getResult();\n");
 
-  return js_beautify(stringBuilder.build(), {
-    indent_size: 2,
-    wrap_line_length: 100,
-  });
+  return {
+    js: js_beautify(stringBuilder.build(), {
+      indent_size: 2,
+      wrap_line_length: 100,
+    }),
+    godelSequence,
+  };
 };

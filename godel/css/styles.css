@@ -69,3 +69,14 @@ hr {
   border-top: 2px solid black;
   border-bottom: none;
 }
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+@media only screen and (max-width: 1000px) {
+  .source-container {
+    flex-direction: column;
+  }
+}
