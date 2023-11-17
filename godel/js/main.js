@@ -77,6 +77,18 @@ const compiledEditorEl = CodeMirror.fromTextArea(compiledEl, codeMirrorConfig);
 const godelSequenceEl = document.getElementById("godel_sequence");
 const godelNumberEl = document.getElementById("godel_number");
 const godelNumberComputeBtn = document.getElementById("godel_number_comp");
+const copyStateButton = document.getElementById("copy");
+
+// hackily copy the program state and put it in the clipboard
+copyStateButton.addEventListener("click", () => {
+  const instructions = btoa(instructionsEditorEl.getValue());
+
+  navigator.clipboard
+    .writeText(
+      window.location.href.split("?")[0] + `?instructions=${instructions}`
+    )
+    .then(() => alert("copied to clipboard"));
+});
 
 state.subscribe((msg) => {
   if (msg.type == MESSAGES.COMPILE_RESULT) {
@@ -146,7 +158,7 @@ state.subscribe((msg) => {
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get("instructions")) {
-  editorEl.setValue(atob(urlParams.get("instructions")));
+  instructionsEditorEl.setValue(atob(urlParams.get("instructions")));
 }
 
 compileButton.addEventListener("click", () => {
