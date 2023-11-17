@@ -1,8 +1,8 @@
-Program = instructions: Line* {
-  return { instructions: instructions };
+Program = lines: (Line / (_/[\n]))* {
+  return { instructions: lines.filter((line) => typeof line !== "string" || line.trim() != "") };
 }
 
-Line = instruction: (LabeledInstruction / Instruction) _ {
+Line = _? instruction: (LabeledInstruction / Instruction) _? [\n]? {
   return instruction;
 }
 
@@ -16,9 +16,14 @@ Label = "[" _? label:LABEL_V _? "]" {
   
 Instruction = conditional: Conditional { return { conditional }; } 
   / assignment: Assignment { return { assignment }; }
+  / goto: Goto { return { goto }; }
 
-Conditional = "IF" _ variable: VAR  _ "!=" _ "0" _ "GOTO" _ label: Label {
-  return { variable, label };
+Goto = GOTO _ label: LABEL_V {
+  return { label };
+}
+
+Conditional = "IF" _ variable: VAR  _? "!=" _? "0" _ goto: Goto {
+  return { variable, goto };
 }
 
 Assignment = variable: VAR _ "<-" _ expr: Expression {
@@ -30,19 +35,25 @@ Assignment = variable: VAR _ "<-" _ expr: Expression {
 
 Expression = left: VAR _ opr: OPERATION _ "1" {
   return { left, opr };
+} / left: VAR  {
+  return { left };
 }
 
 VAR = symbol:"Y" { return symbol } / symbol:("X" / "Z") ind:Integer+ {
   return symbol + ind;
 }
 
+GOTO = "GOTO"
+
 OPERATION = "+" / "-"
 
-LABEL_V = symbol:[A-E] ind:Integer+ {
+LABEL_V = symbol:END_LABEL { return symbol } / symbol:[A-E] ind:Integer+ {
   return symbol + ind;
 }
 
-Integer "integer"
-  = _ [0-9]+ { return parseInt(text(), 10); }
+END_LABEL = "E"
 
-_ "whitespace" = [ \t\n\r]* {  }
+Integer "integer"
+  = [0-9]+ { return parseInt(text(), 10); }
+
+_ "whitespace" = [ \t]+ {  }

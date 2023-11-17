@@ -1,35 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>L-Program Compiler</title>
-  <link rel="stylesheet" type="text/css" href="css/styles.css">
-  <link rel="stylesheet" type="text/css" href=
-  "codemirror/codemirror.css">
-</head>
-<body>
-  <div class="container">
-    <h1>L-Program Compiler</h1>
-    <p><i>Developed for Kulyukin's CS5000</i></p>
-    <hr>
-    <div class="textarea-container">
-      <textarea id="instructions">// asdf
-q0 B 1 q1
-q1 1 R q1
-q1 B 1 q2
-q2 1 R q2
-q2 B 1 f</textarea>
-      <div>
-        <button id="compile">Compile</button><span style=
-        "margin-left: 0.5rem" id="compile_status"></span>
-      </div>
-      <div>
-        <button id="copy_state">Copy State</button>
+  <head>
+    <title>Liz's L-Program Compiler</title>
+    <link rel="stylesheet" type="text/css" href="codemirror/codemirror.css" />
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Liz's L-Program Compiler</h1>
+      <p><i>Developed for Kulyukin's CS5000</i></p>
+      <hr />
+      <div class="source-container">
+        <div class="textarea-container">
+          <h3>L Source</h3>
+          <textarea id="instructions">
+// asdf
+[ B1 ] X1 <- X1 + 1
+       IF X1 != 0 GOTO B1
+       X1 <- X1
+</textarea
+          >
+          <div>
+            <button id="compile">Compile</button
+            ><span style="margin-left: 0.5rem" id="compile_status"></span>
+          </div>
+        </div>
+        <div class="textarea-container">
+          <h3>Compiled JS</h3>
+          <textarea id="compiled"></textarea>
+          <div>
+            <button id="eval">Eval</button
+            ><span style="margin-left: 0.5rem" id="eval_status"></span>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  <script src="codemirror/codemirror.js"></script> 
-  <script src="js/observable.js"></script> 
-  <script src="js/parser.js"></script> 
-  <script src="js/main.js"></script>
-</body>
+    <script src="codemirror/codemirror.js"></script>
+    <script src="js-beautify/js-beautify.js"></script>
+
+    <script src="js/observable.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/compiler.js"></script>
+    <script src="js/main.js"></script>
+  </body>
 </html>
