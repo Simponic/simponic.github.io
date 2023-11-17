@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Liz's L-Program Compiler</title>
+  <link rel="stylesheet" type="text/css" href=
+  "codemirror/codemirror.css">
+  <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Liz's L-Program Compiler</h1>
+    <p><i>Developed for Kulyukin's CS5000</i></p>
+    <hr>
+    <div class="source-container">
+      <div class="textarea-container">
+        <h3>L Source</h3>
+        <textarea id=
+        "instructions">// 0. primitive instructions only
+// 1. labels match the regex [A-E](:digit:)+.
+// 2. variables are initialized to zero and match 
+//    (Y | (X|Z)(:digit:)+).
+// 3. instructions must be delimited by a newline.
+// 4. anything following the comment token "//" up to a
+//    newline are ignored.
+// 5. by default, a computation that takes more than 500_000
+//    "procedures", it will be halted.
+// 6. the implicit exit label "E1" exists; thus to exit
+//    prematurely, "GOTO E1".
+// 7. input your initial snapshot in the "variables" map
+//    on the Program in the compiled JS output
+// 8. for a more detailed view on the grammar, it's at
+//    /godel/grammar.peg
+
+// THIS PROGRAM COMPUTES X1 + X2
+
+// Y &lt;- X1
+[ A1 ] IF X1 != 0 GOTO A2
+       GOTO B1
+[ A2 ] X1 &lt;- X1 - 1
+       Y &lt;- Y + 1
+       GOTO A1
+
+// Z1 &lt;- X2
+[ B1 ] IF X2 != 0 GOTO B2
+       GOTO C1
+[ B2 ] X2 &lt;- X2 - 1
+       Z1 &lt;- Z1 + 1
+       GOTO B1
+
+// Y &lt;- Y + Z1
+[ C1 ] IF Z1 != 0 GOTO C2
+       GOTO E1
+[ C2 ] Z1 &lt;- Z1 - 1
+       Y &lt;- Y + 1
+       GOTO C1</textarea>
+        <div>
+          <button id="compile">Compile</button> <button id=
+          "copy">Copy</button>
+        </div>
+        <div>
+          <span style="margin-left: 0.5rem" id=
+          "compile_status"></span>
+        </div>
+      </div>
+      <div class="textarea-container">
+        <h3>Compiled JS</h3>
+        <textarea id="compiled"></textarea>
+        <div>
+          <button id="eval">Eval</button>
+        </div>
+        <div>
+          <span style="margin-left: 0.5rem" id=
+          "eval_status"></span>
+        </div>
+      </div>
+    </div>
+    <div class="textarea-container">
+      <h3>Godel</h3>
+      <p>Sequence:</p>
+      <pre id="godel_sequence"></pre>
+      <div>
+        <p>Number: <button id="godel_number_comp" style=
+        "display: none">Compute (this might take a
+        while)</button></p>
+      </div>
+      <pre id="godel_number"></pre>
+    </div>
+  </div>
+  <script src="codemirror/codemirror.js"></script> 
+  <script src="js-beautify/js-beautify.js"></script> 
+  <script src="js/observable.js"></script> 
+  <script src="js/parser.js"></script> 
+  <script src="js/compiler.js"></script> 
+  <script src="js/main.js"></script>
+</body>
+</html>
