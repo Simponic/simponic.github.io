@@ -65,7 +65,8 @@ const compile = (ast) => {
         this.finalInstruction = ${
           ast.instructions.length + 1
         }; // instruction of the implied "exit" label
-        this.labelInstructions.set("E", this.finalInstruction); // "E" is the exit label
+        // "E" is the exit label
+        this.labelInstructions.set("E", this.finalInstruction); 
       }
 
       get(variable) {
@@ -106,13 +107,14 @@ const compile = (ast) => {
         return this.variables.get("Y");
       }
 
-      run(maxIter=50000) {
+      run(maxIter=500_000) {
         let iter = 0;
         while (!this.isCompleted() && (++iter) < maxIter) this.step();
         if (iter < maxIter) {
           return this.getResult();
         }
-        throw new Error("Iterations went over maxIter=(" + maxIter + "). To resolve, please ask Turing how we can tell if a program will halt during compilation.");
+        throw new Error("Too many iterations. To resolve, please ask"
+           + " Turing how we can find if a program will halt during compilation.");
       }
 
       main() {
@@ -124,10 +126,10 @@ const compile = (ast) => {
     const instructionIdx = i + 1;
     if (line.label) {
       stringBuilder.add(
-        `this.instructions.set(${instructionIdx}, () => this.${line.label}());\n`,
+        `this.instructions.set(${instructionIdx}, () => this.${line.label}());\n`
       );
       stringBuilder.add(
-        `this.labelInstructions.set("${line.label}", ${instructionIdx});\n`,
+        `this.labelInstructions.set("${line.label}", ${instructionIdx});\n`
       );
     }
   }
@@ -138,7 +140,7 @@ const compile = (ast) => {
     const instructionIdx = i + 1;
     if (instruction.label) {
       stringBuilder.add(
-        `  this.followGoto("${instruction.label}");\n}\n\n${instruction.label}() {\n`,
+        `  this.followGoto("${instruction.label}");\n}\n\n${instruction.label}() {\n`
       );
       stringBuilder.add(`this.instructionPointer = ${instructionIdx};\n`);
       instruction = instruction.instruction;
@@ -152,12 +154,12 @@ const compile = (ast) => {
   stringBuilder.add("const program = new Program();\n\n");
   stringBuilder.add("// set the initial Snapshot here\n");
   stringBuilder.add('// program.variables.set("X1", 2);\n\n');
-  stringBuilder.add(
-    "program.run(50_000); // 50_000 is the max iterations before throwing an exception\n",
-  );
+  stringBuilder.add("program.run();\n");
+  stringBuilder.add("console.log(program.variables);\n");
+  stringBuilder.add("program.getResult();\n");
 
   return js_beautify(stringBuilder.build(), {
     indent_size: 2,
-    wrap_line_length: 120,
+    wrap_line_length: 100,
   });
 };
